@@ -1,0 +1,11 @@
+config BR2_PACKAGE_JORNADA_MOUSEBUTTONS
+	bool "jornada_mousebuttons"
+	depends on BR2_USE_MMU # fork()
+	help
+	  jornada_mousebuttons
+
+	  For Jornada 7xx devices implements the ability to use front audio buttons
+          as mousebuttons.
+
+	  https://github.com/timob0/jornada-mousebuttons/upload/master
+
