@@ -1,11 +1,14 @@
-evdev-right-click-emulation
+jornada-mousebuttons (was: evdev-right-click-emulation)
 ---
 
-A program that solves the problem of right clicks on Linux devices with a touchscreen. It implements the long-press-to-right-click gesture on Linux touchscreen devices while having no specific requirements on the desktop environment, display server or the distribution, which greatly improves the touch experience for users of Linux distributions.
+This is based on PeterCxy's work to implement "long-tap to right click" for evdev touchscreens. This variant includes a couple of modifications to target Jornada 7xx devices by:
+- Adding the ability to use front audio buttons as L/M/R buttons
+- Adding the ability to disable touchscreen tap so that only front buttons work
+- Adding the ability to switch to relative movements to emulating a real mouse even closer
 
-It directly reads from `evdev` touchscreen input devices, parses the events, and triggers a right click with `uinput` when it detects a long press from a touchscreen. Since `evdev` is lower-level than `libinput` or any other user-space input driver, this program can work regardless of your choice of Xorg or Wayland.
+It will connect to the event0 and event1 devices to read keyboard and touchscreen events. It will then add a new event2 device which will be the emulated pointing device that can be used as a touchscreen / mouse device in other applications.
 
-This program started as a Python script that I published on [Gist](https://gist.github.com/PeterCxy/b4e256b6b4a133c93c012b9738c557ca). However, the Python binding of `libevdev` had some mysterious bugs, and I thought it was not the best idea to run a Python interpreter to read every input event just to implement a simple feature. Thus I rewrote it in C, which is what is contained in this repository.
+Layering tslib on top of this is particlarily useful to get proper calibration.
 
 Dependencies
 ---
