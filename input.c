@@ -61,8 +61,7 @@ void unarm_delayed_rclick(struct input_state_t *state) {
     }, NULL);
 }
 
-void on_input_event(struct input_state_t *state,
-        struct input_event *ev, int dev_id) {
+void on_input_event(struct input_state_t *state, struct input_event *ev, int dev_id) {
     // If we are during a long-press event,
     // do not interruput with another device
     if (state->pressed_device_id != -1 && dev_id != state->pressed_device_id)
@@ -76,7 +75,8 @@ void on_input_event(struct input_state_t *state,
         } else if (ev->code == ABS_Y || ev->code == ABS_MT_POSITION_Y) {
             state->pos_y = ev->value;
         }
-    } else if (ev->type == EV_KEY && ev->code == BTN_TOUCH) {
+    }
+    else if (ev->type == EV_KEY && ev->code == BTN_TOUCH) {
         // Touch event
         if (ev->value == 1) {
             // Schedule a delayed right click event
@@ -88,6 +88,19 @@ void on_input_event(struct input_state_t *state,
             unarm_delayed_rclick(state);
         }
     }
+    //J720 R/M/L MB
+    else if (ev->type == EV_KEY && ev->code == KEY_MUTE) {
+	uinput_send_right_btn(state->uinput, ev->value);
+    }
+    else if (ev->type == EV_KEY && ev->code == KEY_VOLUMEDOWN) {
+	uinput_send_middle_btn(state->uinput, ev->value);
+    }
+    else if (ev->type == EV_KEY && ev->code == KEY_VOLUMEUP) {
+	uinput_send_left_btn(state->uinput, ev->value);
+    }
+
+    // Passthrough the movement events
+    uinput_passthrough_event(state->uinput, ev->type, ev->code, ev->value);
 }
 
 void on_timer_expire(struct input_state_t *state) {
@@ -110,7 +123,7 @@ void process_evdev_input(int num, struct libevdev **evdev) {
         .pos_x = -1, .pos_y = -1,
         .pressed_pos_x = -1, .pressed_pos_y = -1,
         .fd_timer = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK),
-        .uinput = uinput_initialize(),
+        .uinput = uinput_initialize(evdev),
     };
 
     // Check if uinput device was created
