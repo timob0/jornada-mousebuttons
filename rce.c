@@ -54,12 +54,11 @@ int find_evdev(struct libevdev **devices) {
     struct libevdev *evdev = NULL;
     struct dirent *dev_input_entry = NULL;
     int device_num = 0;
-    // Loop over /dev/input to find touchscreen
+    // Loop over /dev/input to find touchscreen and a keyboard
     // There can be multiple touchscreen devices.
     // e.g. a touch screen, two stylus for that screen (like on Surface)
     while ((dev_input_entry = readdir(dev_input_fd)) != NULL) {
-        if (strncmp(EVDEV_PREFIX,
-                dev_input_entry->d_name, strlen(EVDEV_PREFIX)) != 0) {
+        if (strncmp(EVDEV_PREFIX, dev_input_entry->d_name, strlen(EVDEV_PREFIX)) != 0) {
             // Not a /dev/input/event*
             continue;
         }
@@ -76,10 +75,17 @@ int find_evdev(struct libevdev **devices) {
         }
 
         // A touchscreen is absolute input, with TOUCH events
-        if (libevdev_has_event_type(evdev, EV_ABS)
-                && !libevdev_has_event_type(evdev, EV_REL)
-                && libevdev_has_event_code(evdev, EV_KEY, BTN_TOUCH)
-                && !libevdev_has_event_code(evdev, EV_KEY, BTN_RIGHT)) {
+        if (
+             (     libevdev_has_event_type(evdev, EV_ABS)
+               && !libevdev_has_event_type(evdev, EV_REL)
+               &&  libevdev_has_event_code(evdev, EV_KEY, BTN_TOUCH)
+               && !libevdev_has_event_code(evdev, EV_KEY, BTN_RIGHT)
+             ) 
+             ||
+             (     libevdev_has_event_type(evdev, EV_KEY)
+	     )
+	   )
+	{
             const char *name = libevdev_get_name(evdev);
             printf("Found touch screen at %s: %s\n", dev_path, name);
             if (TOUCH_DEVICE_WHITELIST == NULL) {
