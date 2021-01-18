@@ -78,14 +78,15 @@ void on_input_event(struct input_state_t *state, struct input_event *ev, int dev
     }
     else if (ev->type == EV_KEY && ev->code == BTN_TOUCH) {
         // Touch event
-        if (ev->value == 1) {
-            // Schedule a delayed right click event
-            // so that if anything happens before the long-press timeout,
-            // it can be canceled
-            arm_delayed_rclick(state, dev_id);
+	// cancel if tap disabled
+	if (!ENABLE_TAP) return;
+        
+	if (ev->value == 1) {
+          	// Schedule a delayed right click event
+               arm_delayed_rclick(state, dev_id);
         } else {
-            // Finger released. It is no longer considered a long-press
-            unarm_delayed_rclick(state);
+                // Finger released. It is no longer considered a long-press
+               unarm_delayed_rclick(state);
         }
     }
     //J720 R/M/L MB
@@ -99,7 +100,7 @@ void on_input_event(struct input_state_t *state, struct input_event *ev, int dev
 	uinput_send_left_btn(state->uinput, ev->value);
     }
 
-    // Passthrough the movement events
+    // Passthrough the movement events     
     uinput_passthrough_event(state->uinput, ev->type, ev->code, ev->value);
 }
 
