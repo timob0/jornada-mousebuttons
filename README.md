@@ -20,12 +20,16 @@ And of course `glibc` and your Linux kernel.
 
 Building
 ---
+Manually:
+Edit Makefile and uncomment CXFLAGS and Include directives, then
 
 ```bash
 make all
 ```
-
 The compiled program lies in `out/evdev-rce`.
+
+For use with buildroot, download the folder subfolder "jornada-mousebuttons" and place it into the "packages" folder in buildroot. Then edit Config.in in the packages folder to point to jornada-mousebuttonsr/Config.in
+Use make menuconfig to activate the package and then make.
 
 Usage
 ---
