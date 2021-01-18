@@ -22,6 +22,14 @@ struct timespec LONG_CLICK_INTERVAL = {
 // Finger is considered still if the movement is within this value
 int LONG_CLICK_FUZZ = 100;
 
+// Enables or disables the touchscreen taps altogether. If 0 then no
+// touch events will be reported thus relying on the buttons only.
+int ENABLE_TAP = 1;
+
+// Enables relative mode. If 1 then the device will report relative
+// instead of absolute movements.
+int ENABLE_REL = 0;
+
 // Blacklist of touch devices that this program
 // should NOT listen on.
 char *TOUCH_DEVICE_BLACKLIST = NULL;
@@ -127,7 +135,7 @@ int find_evdev(struct libevdev **devices) {
 int main() {
     // Try to read some configurable options from env
     char *env = NULL;
-    if ((env = getenv("LONG_CLICK_INTERVAL")) != NULL) {
+    if ((env = getenv("JMB_LONG_CLICK_INTERVAL")) != NULL) {
         int ms = atoi(env);
         int sec = 0;
         if (ms >= 1000) {
@@ -138,19 +146,27 @@ int main() {
         LONG_CLICK_INTERVAL.tv_nsec = ((long) ms) * 1000 * 1000;
     }
 
-    if ((env = getenv("LONG_CLICK_FUZZ")) != NULL) {
+    if ((env = getenv("JMB_LONG_CLICK_FUZZ")) != NULL) {
         LONG_CLICK_FUZZ = atoi(env);
     }
 
-    if ((env = getenv("TOUCH_DEVICE_BLACKLIST")) != NULL) {
+    if ((env = getenv("JMB_TOUCH_DEVICE_BLACKLIST")) != NULL) {
         TOUCH_DEVICE_BLACKLIST = malloc(strlen(env) + 3);
         sprintf(TOUCH_DEVICE_BLACKLIST, "|%s|", env);
     }
 
-    if ((env = getenv("TOUCH_DEVICE_WHITELIST")) != NULL) {
+    if ((env = getenv("JMB_TOUCH_DEVICE_WHITELIST")) != NULL) {
         printf("Note: Whitelist mode is enabled. This overrides the blacklist.\n");
         TOUCH_DEVICE_WHITELIST = malloc(strlen(env) + 3);
         sprintf(TOUCH_DEVICE_WHITELIST, "|%s|", env);
+    }
+
+    if ((env = getenv("JMB_ENABLE_TAP")) != NULL) {        
+        ENABLE_TAP = (atoi(env)>0 ? 1 : 0);
+    }
+
+    if ((env = getenv("JMB_ENABLE_RELATIVE")) != NULL) {        
+        ENABLE_REL = (atoi(env)>0 ? 1 : 0);
     }
 
     struct libevdev *devices[MAX_TOUCHSCREEN_NUM];
