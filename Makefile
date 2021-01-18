@@ -1,8 +1,9 @@
 CC := gcc
-XFLAGS := -Wall -std=c11 -D_POSIX_C_SOURCE=199309L
-LIBRARIES := -levdev
-INCLUDES := -I/usr/include/libevdev-1.0
-CFLAGS := $(XFLAGS) $(LIBRARIES) $(INCLUDES)
+# Commented out the below for buildroot build
+# XFLAGS := -Wall -std=c11 -D_POSIX_C_SOURCE=199309L
+# LIBRARIES := -levdev
+# INCLUDES := -I/usr/include/libevdev-1.0
+# CFLAGS := $(XFLAGS) $(LIBRARIES) $(INCLUDES)
 
 OUTDIR := out
 SOURCES := uinput.c input.c rce.c
