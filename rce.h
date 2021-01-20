@@ -6,4 +6,5 @@
 
 extern struct timespec LONG_CLICK_INTERVAL;
 extern int LONG_CLICK_FUZZ;
+extern int ENABLE_TAP;
 #endif
